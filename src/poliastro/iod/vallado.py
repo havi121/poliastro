@@ -5,7 +5,7 @@ from astropy import units as u
 
 from poliastro.core.iod import vallado as vallado_fast
 
-kms = u.km / u.s
+aus = u.au / u.s
 
 
 def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
@@ -16,11 +16,11 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     Parameters
     ----------
     k : ~astropy.units.Quantity
-        Gravitational constant of main attractor (km^3 / s^2).
+        Gravitational constant of main attractor (au^3 / s^2).
     r0 : ~astropy.units.Quantity
-        Initial position (km).
+        Initial position (au).
     r : ~astropy.units.Quantity
-        Final position (km).
+        Final position (au).
     tof : ~astropy.units.Quantity
         Time of flight (s).
     short : boolean, optional
@@ -42,11 +42,11 @@ def lambert(k, r0, r, tof, short=True, numiter=35, rtol=1e-8):
     not supported.
 
     """
-    k_ = k.to(u.km ** 3 / u.s ** 2).value
-    r0_ = r0.to(u.km).value
-    r_ = r.to(u.km).value
+    k_ = k.to(u.au ** 3 / u.s ** 2).value
+    r0_ = r0.to(u.au).value
+    r_ = r.to(u.au).value
     tof_ = tof.to(u.s).value
 
     v0, v = vallado_fast(k_, r0_, r_, tof_, short, numiter, rtol)
 
-    yield v0 << kms, v << kms
+    yield v0 << aus, v << aus

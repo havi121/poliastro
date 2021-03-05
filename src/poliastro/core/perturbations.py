@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 @jit
 def J2_perturbation(t0, state, k, J2, R):
-    r"""Calculates J2_perturbation acceleration (km/s2)
+    r"""Calculates J2_perturbation acceleration (au/s2)
 
     .. math::
 
@@ -19,9 +19,9 @@ def J2_perturbation(t0, state, k, J2, R):
     t0 : float
         Current time (s)
     state : numpy.ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+        Six component state vector [x, y, z, vx, vy, vz] (au, au/s).
     k : float
-        gravitational constant, (km^3/s^2)
+        gravitational constant, (au^3/s^2)
     J2: float
         oblateness factor
     R: float
@@ -46,16 +46,16 @@ def J2_perturbation(t0, state, k, J2, R):
 
 @jit
 def J3_perturbation(t0, state, k, J3, R):
-    r"""Calculates J3_perturbation acceleration (km/s2)
+    r"""Calculates J3_perturbation acceleration (au/s2)
 
     Parameters
     ----------
     t0 : float
         Current time (s)
     state : numpy.ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+        Six component state vector [x, y, z, vx, vy, vz] (au, au/s).
     k : float
-        gravitational constant, (km^3/s^2)
+        gravitational constant, (au^3/s^2)
     J3: float
         oblateness factor
     R: float
@@ -82,7 +82,7 @@ def J3_perturbation(t0, state, k, J3, R):
 
 @jit
 def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
-    r"""Calculates atmospheric drag acceleration (km/s2)
+    r"""Calculates atmospheric drag acceleration (au/s2)
 
     .. math::
 
@@ -96,19 +96,19 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
     t0 : float
         Current time (s)
     state : numpy.ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+        Six component state vector [x, y, z, vx, vy, vz] (au, au/s).
     k : float
-        gravitational constant, (km^3/s^2)
+        gravitational constant, (au^3/s^2)
     R : float
-        radius of the attractor (km)
+        radius of the attractor (au)
     C_D: float
         dimensionless drag coefficient ()
     A_over_m: float
-        frontal area/mass of the spacecraft (km^2/kg)
+        frontal area/mass of the spacecraft (au^2/kg)
     H0 : float
-        atmospheric scale height, (km)
+        atmospheric scale height, (au)
     rho0: float
-        the exponent density pre-factor, (kg / km^3)
+        the exponent density pre-factor, (kg / au^3)
 
     Note
     ----
@@ -129,7 +129,7 @@ def atmospheric_drag_exponential(t0, state, k, R, C_D, A_over_m, H0, rho0):
 
 
 def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
-    r"""Calculates atmospheric drag acceleration (km/s2)
+    r"""Calculates atmospheric drag acceleration (au/s2)
 
     .. math::
 
@@ -143,15 +143,15 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
     t0 : float
         Current time (s)
     state : numpy.ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+        Six component state vector [x, y, z, vx, vy, vz] (au, au/s).
     k : float
-        gravitational constant, (km^3/s^2)
+        gravitational constant, (au^3/s^2)
     R : float
-        radius of the attractor (km)
+        radius of the attractor (au)
     C_D: float
         dimensionless drag coefficient ()
     A_over_m: float
-        frontal area/mass of the spacecraft (km^2/kg)
+        frontal area/mass of the spacecraft (au^2/kg)
     model: a callable model from poliastro.earth.atmosphere
 
     Note
@@ -171,7 +171,7 @@ def atmospheric_drag_model(t0, state, k, R, C_D, A_over_m, model):
         # The integration will go a little negative searching for H = R
         H = R
 
-    rho = model.density((H - R) * u.km).to(u.kg / u.km ** 3).value
+    rho = model.density((H - R) * u.au).to(u.kg / u.au ** 3).value
 
     return -(1.0 / 2.0) * rho * B * v * v_vec
 
@@ -183,11 +183,11 @@ def shadow_function(r_sat, r_sun, R):
     Parameters
     ----------
     r_sat : numpy.ndarray
-        position of the satellite in the frame of attractor (km)
+        position of the satellite in the frame of attractor (au)
     r_sun : numpy.ndarray
-        position of star in the frame of attractor (km)
+        position of star in the frame of attractor (au)
     R : float
-        radius of body (attractor) that creates shadow (km)
+        radius of body (attractor) that creates shadow (au)
 
     """
 
@@ -202,7 +202,7 @@ def shadow_function(r_sat, r_sun, R):
 
 
 def third_body(t0, state, k, k_third, perturbation_body):
-    r"""Calculates 3rd body acceleration (km/s2)
+    r"""Calculates 3rd body acceleration (au/s2)
 
     .. math::
 
@@ -213,9 +213,9 @@ def third_body(t0, state, k, k_third, perturbation_body):
     t0 : float
         Current time (s)
     state : numpy.ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+        Six component state vector [x, y, z, vx, vy, vz] (au, au/s).
     k : float
-        gravitational constant, (km^3/s^2)
+        gravitational constant, (au^3/s^2)
     perturbation_body: a callable object returning the position of the pertubation body that causes the perturbation
 
     Note
@@ -231,7 +231,7 @@ def third_body(t0, state, k, k_third, perturbation_body):
 
 
 def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
-    r"""Calculates radiation pressure acceleration (km/s2)
+    r"""Calculates radiation pressure acceleration (au/s2)
 
     .. math::
 
@@ -242,17 +242,17 @@ def radiation_pressure(t0, state, k, R, C_R, A_over_m, Wdivc_s, star):
     t0 : float
         Current time (s)
     state : numpy.ndarray
-        Six component state vector [x, y, z, vx, vy, vz] (km, km/s).
+        Six component state vector [x, y, z, vx, vy, vz] (au, au/s).
     k : float
-        gravitational constant, (km^3/s^2)
+        gravitational constant, (au^3/s^2)
     R : float
         radius of the attractor
     C_R: float
         dimensionless radiation pressure coefficient, 1 < C_R < 2 ()
     A_over_m: float
-        effective spacecraft area/mass of the spacecraft (km^2/kg)
+        effective spacecraft area/mass of the spacecraft (au^2/kg)
     Wdivc_s : float
-        total star emitted power divided by the speed of light (W * s / km)
+        total star emitted power divided by the speed of light (W * s / au)
     star: a callable object returning the position of star in attractor frame
         star position
 

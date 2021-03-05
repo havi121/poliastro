@@ -6,7 +6,7 @@ class Spacecraft:
     Class to represent a Spacecraft.
     """
 
-    @u.quantity_input(A=u.km ** 2, C_D=u.one, m=u.kg)
+    @u.quantity_input(A=u.au ** 2, C_D=u.one, m=u.kg)
     def __init__(self, A, C_D, m, **metadata):
         """
         Constructor
@@ -14,7 +14,7 @@ class Spacecraft:
         Parameters
         ----------
         A: ~astropy.units.Quantity
-            Area of the spacecraft (km^2)
+            Area of the spacecraft (au^2)
         C_D: ~astropy.units.Quantity
             Dimensionless drag coefficient ()
         m: ~astropy.units.Quantity
@@ -46,12 +46,12 @@ class Spacecraft:
 
     @property
     def ballistic_coefficient(self):
-        r"""Calculates the Ballistic coefficient (km^2/kg)
+        r"""Calculates the Ballistic coefficient (au^2/kg)
 
         Returns
         -------
         B: ~astropy.units.Quantity
-            Ballistic coefficient (km^2/kg)
+            Ballistic coefficient (au^2/kg)
 
         Notes
         -----

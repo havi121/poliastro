@@ -18,9 +18,9 @@ def rv_pqw(k, p, ecc, nu):
     Parameters
     ----------
     k : float
-        Standard gravitational parameter (km^3 / s^2).
+        Standard gravitational parameter (au^3 / s^2).
     p : float
-        Semi-latus rectum or parameter (km).
+        Semi-latus rectum or parameter (au).
     ecc : float
         Eccentricity.
     nu: float
@@ -93,9 +93,9 @@ def coe2rv(k, p, ecc, inc, raan, argp, nu):
     Parameters
     ----------
     k : float
-        Standard gravitational parameter (km^3 / s^2).
+        Standard gravitational parameter (au^3 / s^2).
     p : float
-        Semi-latus rectum or parameter (km).
+        Semi-latus rectum or parameter (au).
     ecc : float
         Eccentricity.
     inc : float
@@ -176,9 +176,9 @@ def coe2mee(p, ecc, inc, raan, argp, nu):
     Parameters
     ----------
     k : float
-        Standard gravitational parameter (km^3 / s^2).
+        Standard gravitational parameter (au^3 / s^2).
     p : float
-        Semi-latus rectum or parameter (km).
+        Semi-latus rectum or parameter (au).
     ecc : float
         Eccentricity.
     inc : float
@@ -237,18 +237,18 @@ def rv2coe(k, r, v, tol=1e-8):
     Parameters
     ----------
     k : float
-        Standard gravitational parameter (km^3 / s^2)
+        Standard gravitational parameter (au^3 / s^2)
     r : array
-        Position vector (km)
+        Position vector (au)
     v : array
-        Velocity vector (km / s)
+        Velocity vector (au / s)
     tol : float, optional
         Tolerance for eccentricity and inclination checks, default to 1e-8
 
     Returns
     -------
     p : float
-        Semi-latus rectum of parameter (km)
+        Semi-latus rectum of parameter (au)
     ecc: float
         Eccentricity
     inc: float
@@ -317,12 +317,12 @@ def rv2coe(k, r, v, tol=1e-8):
     --------
     >>> from poliastro.bodies import Earth
     >>> from astropy import units as u
-    >>> k = Earth.k.to_value(u.km ** 3 / u.s ** 2)
+    >>> k = Earth.k.to_value(u.au ** 3 / u.s ** 2)
     >>> r = np.array([-6045., -3490., 2500.])
     >>> v = np.array([-3.457, 6.618, 2.533])
     >>> p, ecc, inc, raan, argp, nu = rv2coe(k, r, v)
-    >>> print("p:", p, "[km]")  # doctest: +FLOAT_CMP
-    p: 8530.47436396927 [km]
+    >>> print("p:", p, "[au]")  # doctest: +FLOAT_CMP
+    p: 8530.47436396927 [au]
     >>> print("ecc:", ecc)  # doctest: +FLOAT_CMP
     ecc: 0.17121118195416898
     >>> print("inc:", np.rad2deg(inc), "[deg]")  # doctest: +FLOAT_CMP

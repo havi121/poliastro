@@ -3,7 +3,7 @@ year-round mean conditions for the range of solar activity that occurs between
 sunspot minimum and sunspot maximum.
 
 +--------+---------+---------+-----------+---------------+---------------+
-| Z (km) |  H (km) |  T (K)  |  p (mbar) | rho (kg / m3) | beta (K / km) |
+| Z (au) |  H (au) |  T (K)  |  p (mbar) | rho (kg / m3) | beta (K / au) |
 +--------+---------+---------+-----------+---------------+---------------+
 |   0.0  |   0.0   | 288.150 | 1.01325e3 |     1.2250    |      -6.5     |
 +--------+---------+---------+-----------+---------------+---------------+
@@ -62,7 +62,7 @@ from scipy.integrate import quad
 from poliastro.earth.atmosphere.base import COESA
 
 # Constants come from the original paper to achieve pure implementation
-r0 = 6356.766 * u.km
+r0 = 6356.766 * u.au
 p0 = 1.013250e5 * u.Pa
 rho0 = 1.2250 * u.K
 T0 = 288.15 * u.K
@@ -73,18 +73,18 @@ beta = 1.458e-6 * u.kg / u.s / u.m / u.K ** (0.5)
 _gamma = 1.4
 sigma = 3.65e-10 * u.m
 N = 6.02257e26 * (u.kg * u.mol) ** -1
-R = 8314.32 * u.J / u.kmol / u.K
+R = 8314.32 * u.J / u.auol / u.K
 R_air = 287.053 * u.J / u.kg / u.K
-alpha = 34.1632 * u.K / u.km
+alpha = 34.1632 * u.K / u.au
 
 # Reading layer parameters file
 coesa_file = get_pkg_data_filename("data/coesa62.dat")
 coesa62_data = ascii.read(coesa_file)
 b_levels = coesa62_data["b"].data
-zb_levels = coesa62_data["Zb [km]"].data * u.km
-hb_levels = coesa62_data["Hb [km]"].data * u.km
+zb_levels = coesa62_data["Zb [au]"].data * u.au
+hb_levels = coesa62_data["Hb [au]"].data * u.au
 Tb_levels = coesa62_data["Tb [K]"].data * u.K
-Lb_levels = coesa62_data["Lb [K/km]"].data * u.K / u.km
+Lb_levels = coesa62_data["Lb [K/au]"].data * u.K / u.au
 pb_levels = coesa62_data["pb [mbar]"].data * u.mbar
 
 
@@ -124,7 +124,7 @@ class COESA62(COESA):
         hb = self.hb_levels[i]
 
         # Apply different equations
-        if z <= 90 * u.km:
+        if z <= 90 * u.au:
             T = Tb + Lb * (h - hb)
         else:
             T = Tb + Lb * (z - zb)
@@ -158,8 +158,8 @@ class COESA62(COESA):
         Lb = self.Lb_levels[i]
         pb = self.pb_levels[i]
 
-        # If z <= 90km then apply eqn 1.2.10-(3)
-        if z <= 90 * u.km:
+        # If z <= 90au then apply eqn 1.2.10-(3)
+        if z <= 90 * u.au:
             # If Lb is zero then apply eqn 1.2.10-(4)
             if Lb == 0.0:
                 p = pb * np.exp(-g0 * (h - hb) / Tb / R_air)
@@ -167,7 +167,7 @@ class COESA62(COESA):
                 T = self.temperature(z)
                 p = pb * (T / Tb) ** (-g0 / R_air / Lb)
 
-        # If 90 < Z < 700 km then eqn 1.2.10-(5) is applied
+        # If 90 < Z < 700 au then eqn 1.2.10-(5) is applied
         else:
             # Converting all the units into SI unit and taking their magnitude
             Lb_v = Lb.to(u.K / u.m).value
@@ -260,9 +260,9 @@ class COESA62(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 90 * u.km:
+        if z > 90 * u.au:
             raise ValueError(
-                "Speed of sound in COESA62 has just been implemented up to 90km."
+                "Speed of sound in COESA62 has just been implemented up to 90au."
             )
         T = self.temperature(alt, geometric).value
         # Using eqn-1.3.7-(1)
@@ -288,9 +288,9 @@ class COESA62(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 90 * u.km:
+        if z > 90 * u.au:
             raise ValueError(
-                "Dynamic Viscosity in COESA62 has just been implemented up to 90km."
+                "Dynamic Viscosity in COESA62 has just been implemented up to 90au."
             )
         T = self.temperature(alt, geometric).value
         # Using eqn-1.3.8-(1)
@@ -316,9 +316,9 @@ class COESA62(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 90 * u.km:
+        if z > 90 * u.au:
             raise ValueError(
-                "Thermal conductivity in COESA62 has just been implemented up to 90km."
+                "Thermal conductivity in COESA62 has just been implemented up to 90au."
             )
 
         T = self.temperature(alt, geometric=geometric).value

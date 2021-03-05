@@ -1,9 +1,9 @@
 """ The U.S. Standard Atmosphere 1976 is an idealized, steady-state model of
-mean annual conditions of Earth's atmosphere from the surface to 1000 km at
+mean annual conditions of Earth's atmosphere from the surface to 1000 au at
 latitude 45N, as it is assumed to exist during a period with moderate solar
 activity. The defining meteorological elements are sea-level temperature and
-pressure, and a temperature-height profile to 1000 km. The air is assumed to be
-dry, and at heights sufficiently below 86 km, the atmosphere is assumed to be
+pressure, and a temperature-height profile to 1000 au. The air is assumed to be
+dry, and at heights sufficiently below 86 au, the atmosphere is assumed to be
 homogeneously mixed with a relative-volume composition leading to a constant
 mean molecular weight.
 
@@ -12,7 +12,7 @@ updated. In order to have a pure COESA76 atmospheric model, the official paper
 values were used.
 
 +--------+---------+---------+-----------+---------------+---------------+
-| Z (km) |  H (km) |  T (K)  |  p (mbar) | rho (kg / m3) | beta (K / km) |
+| Z (au) |  H (au) |  T (K)  |  p (mbar) | rho (kg / m3) | beta (K / au) |
 +--------+---------+---------+-----------+---------------+---------------+
 |   0.0  |   0.0   | 288.150 | 1.01325e3 |     1.2250    |      -6.5     |
 +--------+---------+---------+-----------+---------------+---------------+
@@ -52,28 +52,28 @@ from poliastro.earth.atmosphere.base import COESA
 
 # Following constants come from original U.S Atmosphere 1962 paper so a pure
 # model of this atmosphere can be implemented
-R = 8314.32 * u.J / u.kmol / u.K
+R = 8314.32 * u.J / u.auol / u.K
 R_air = 287.053 * u.J / u.kg / u.K
 k = 1.380622e-23 * u.J / u.K
-Na = 6.022169e-26 / u.kmol
+Na = 6.022169e-26 / u.auol
 g0 = 9.80665 * u.m / u.s ** 2
-r0 = 6356.766 * u.km
-M0 = 28.9644 * u.kg / u.kmol
+r0 = 6356.766 * u.au
+M0 = 28.9644 * u.kg / u.auol
 P0 = 101325 * u.Pa
 T0 = 288.15 * u.K
 Tinf = 1000 * u.K
 gamma = 1.4
-alpha = 34.1632 * u.K / u.km
+alpha = 34.1632 * u.K / u.au
 beta = 1.458e-6 * (u.kg / u.s / u.m / (u.K) ** 0.5)
 S = 110.4 * u.K
 
 # Reading layer parameters file
 coesa76_data = ascii.read(get_pkg_data_filename("data/coesa76.dat"))
 b_levels = coesa76_data["b"].data
-zb_levels = coesa76_data["Zb [km]"].data * u.km
-hb_levels = coesa76_data["Hb [km]"].data * u.km
+zb_levels = coesa76_data["Zb [au]"].data * u.au
+hb_levels = coesa76_data["Hb [au]"].data * u.au
 Tb_levels = coesa76_data["Tb [K]"].data * u.K
-Lb_levels = coesa76_data["Lb [K/km]"].data * u.K / u.km
+Lb_levels = coesa76_data["Lb [K/au]"].data * u.K / u.au
 pb_levels = coesa76_data["pb [mbar]"].data * u.mbar
 
 # Reading pressure and density coefficients files
@@ -81,7 +81,7 @@ p_data = ascii.read(get_pkg_data_filename("data/coesa76_p.dat"))
 rho_data = ascii.read(get_pkg_data_filename("data/coesa76_rho.dat"))
 
 # Zip coefficients for each altitude
-z_coeff = p_data["z [km]"].data * u.km
+z_coeff = p_data["z [au]"].data * u.au
 p_coeff = [
     p_data["A"].data,
     p_data["B"].data,
@@ -158,21 +158,21 @@ class COESA76(COESA):
 
         # Apply different equations
         if z < self.zb_levels[7]:
-            # Below 86km
+            # Below 86au
             # TODO: Apply air mean molecular weight ratio factor
             Tm = Tb + Lb * (h - hb)
             T = Tm
         elif z >= self.zb_levels[7] and z < self.zb_levels[8]:
-            # [86km, 91km)
+            # [86au, 91au)
             T = 186.87 * u.K
         elif z >= self.zb_levels[8] and z < self.zb_levels[9]:
-            # [91km, 110km]
+            # [91au, 110au]
             Tc = 263.1905 * u.K
             A = -76.3232 * u.K
-            a = -19.9429 * u.km
+            a = -19.9429 * u.au
             T = Tc + A * (1 - ((z - self.zb_levels[8]) / a) ** 2) ** 0.5
         elif z >= self.zb_levels[9] and z < self.zb_levels[10]:
-            # [110km, 120km]
+            # [110au, 120au]
             T = 240 * u.K + Lb * (z - self.zb_levels[9])
         else:
             T10 = 360.0 * u.K
@@ -208,9 +208,9 @@ class COESA76(COESA):
         hb = self.hb_levels[i]
         pb = self.pb_levels[i]
 
-        # If above 86[km] usual formulation is applied
-        if z < 86 * u.km:
-            if Lb == 0.0 * u.K / u.km:
+        # If above 86[au] usual formulation is applied
+        if z < 86 * u.au:
+            if Lb == 0.0 * u.K / u.au:
                 p = pb * np.exp(-alpha * (h - hb) / Tb)
             else:
                 T = self.temperature(z)
@@ -223,7 +223,7 @@ class COESA76(COESA):
             A, B, C, D, E = self._get_coefficients_avobe_86(z, p_coeff)
 
             # Solve the polynomial
-            z = z.to(u.km).value
+            z = z.to(u.au).value
             p = np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E) * u.Pa
 
         return p.to(u.Pa)
@@ -247,7 +247,7 @@ class COESA76(COESA):
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
         # Solve temperature and pressure
-        if z <= 86 * u.km:
+        if z <= 86 * u.au:
             T = self.temperature(z)
             p = self.pressure(z)
             rho = p / R_air / T
@@ -259,7 +259,7 @@ class COESA76(COESA):
             A, B, C, D, E = self._get_coefficients_avobe_86(z, rho_coeff)
 
             # Solve the polynomial
-            z = z.to(u.km).value
+            z = z.to(u.au).value
             rho = (
                 np.exp(A * z ** 4 + B * z ** 3 + C * z ** 2 + D * z + E)
                 * u.kg
@@ -311,9 +311,9 @@ class COESA76(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 86 * u.km:
+        if z > 86 * u.au:
             raise ValueError(
-                "Speed of sound in COESA76 has just been implemented up to 86km."
+                "Speed of sound in COESA76 has just been implemented up to 86au."
             )
         T = self.temperature(alt, geometric).value
         # Using eqn-(50)
@@ -339,9 +339,9 @@ class COESA76(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 86 * u.km:
+        if z > 86 * u.au:
             raise ValueError(
-                "Dynamic Viscosity in COESA76 has just been implemented up to 86km."
+                "Dynamic Viscosity in COESA76 has just been implemented up to 86au."
             )
         T = self.temperature(alt, geometric).value
         # Using eqn-(51)
@@ -367,9 +367,9 @@ class COESA76(COESA):
         # Check if valid range and convert to geopotential
         z, h = self._check_altitude(alt, r0, geometric=geometric)
 
-        if z > 86 * u.km:
+        if z > 86 * u.au:
             raise ValueError(
-                "Thermal conductivity in COESA76 has just been implemented up to 86km."
+                "Thermal conductivity in COESA76 has just been implemented up to 86au."
             )
         T = self.temperature(alt, geometric=geometric).value
         # Using eqn-(53)
